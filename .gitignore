@@ -1,0 +1,47 @@
+# dependencies
+node_modules/
+civic-report-admin/node_modules/
+functions/node_modules/
+
+# Next.js build output
+.next/
+civic-report-admin/.next/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Environment variables & secrets
+.env
+.env*.local
+*.env
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+/ios
+/android
