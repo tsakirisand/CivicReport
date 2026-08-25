@@ -16,7 +16,7 @@ import { useCivicStore } from '../../lib/store';
 import { Report, TRANSLATIONS } from '../../types';
 import { getCategoryBadge, getMarkerColor } from '../../components/map/interactive-map';
 import { ReportDetailModal } from '../../components/reports/report-detail-modal';
-import { fetchAllReports } from '../../lib/reports-service';
+import { fetchAllReports, isReportOwnedByUser } from '../../lib/reports-service';
 
 export default function MyReportsScreen() {
   const router = useRouter();
@@ -35,6 +35,27 @@ export default function MyReportsScreen() {
     await fetchAllReports();
     setRefreshing(false);
   };
+
+  // Filter Reports for "My Reports" view (strictly current user's submitted reports)
+  const myReports = useMemo(() => {
+    if (!user) return [];
+    return reports.filter((r) => {
+      if (!isReportOwnedByUser(r.user_id, user)) return false;
+
+      if (statusTab === 'active' && r.status === 'resolved') return false;
+      if (statusTab === 'resolved' && r.status !== 'resolved') return false;
+
+      if (searchQuery.trim().length > 0) {
+        const q = searchQuery.toLowerCase();
+        const matchDesc = r.description.toLowerCase().includes(q);
+        const matchAddr = r.address.toLowerCase().includes(q);
+        const matchCat = r.category.toLowerCase().includes(q);
+        if (!matchDesc && !matchAddr && !matchCat) return false;
+      }
+
+      return true;
+    });
+  }, [reports, user, statusTab, searchQuery]);
 
   // Guest Access Control: Guests can ONLY view the Map tab
   if (isGuest || !user) {
@@ -74,27 +95,6 @@ export default function MyReportsScreen() {
       </SafeAreaView>
     );
   }
-
-  // Filter Reports for "My Reports" view (strictly current user's submitted reports)
-  const myReports = useMemo(() => {
-    if (!user) return [];
-    return reports.filter((r) => {
-      if (r.user_id !== user.id) return false;
-
-      if (statusTab === 'active' && r.status === 'resolved') return false;
-      if (statusTab === 'resolved' && r.status !== 'resolved') return false;
-
-      if (searchQuery.trim().length > 0) {
-        const q = searchQuery.toLowerCase();
-        const matchDesc = r.description.toLowerCase().includes(q);
-        const matchAddr = r.address.toLowerCase().includes(q);
-        const matchCat = r.category.toLowerCase().includes(q);
-        if (!matchDesc && !matchAddr && !matchCat) return false;
-      }
-
-      return true;
-    });
-  }, [reports, user, statusTab, searchQuery]);
 
   const getRelativeDate = (dateStr: string) => {
     const diffMs = Date.now() - new Date(dateStr).getTime();

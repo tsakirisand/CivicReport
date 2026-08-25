@@ -14,6 +14,7 @@ import { firebaseAuth } from './firebase';
 import { supabase } from './supabase';
 import { useCivicStore } from './store';
 import { UserProfile } from '../types';
+import { ensureUserInSupabase, fetchAllReports } from './reports-service';
 
 /**
  * Signs in anonymously with Firebase Auth (Guest Mode).
@@ -71,6 +72,8 @@ export async function loginUser(email: string, pass: string) {
         };
 
     store.setUser(userProfile);
+    ensureUserInSupabase(userProfile);
+    fetchAllReports();
     return { success: true, user: userProfile };
   } catch (err: any) {
     const code = err?.code;
@@ -135,6 +138,8 @@ export async function signUpUser(params: {
     };
 
     store.registerUserAccount(newUser);
+    ensureUserInSupabase(newUser);
+    fetchAllReports();
     return { success: true, user: newUser };
   } catch (err: any) {
     const code = err?.code;

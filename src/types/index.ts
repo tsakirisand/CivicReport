@@ -84,6 +84,16 @@ export interface ReportUpdate {
   updated_at: string;
 }
 
+export interface ReportMessage {
+  id: string;
+  report_id: string;
+  sender_id: string;
+  sender_type: 'admin' | 'citizen';
+  sender_name: string;
+  message: string;
+  created_at: string;
+}
+
 export interface Report {
   id: string;
   user_id?: string | null;
@@ -202,6 +212,11 @@ export const TRANSLATIONS = {
     ageGroup: 'Age Group',
     phone: 'Phone Number',
     editProfile: 'Edit Profile',
+    messagesTab: 'Messages',
+    messagesTitle: 'Direct Chat with Municipality',
+    messagesSub: 'Text 1-on-1 with Palaio Faliro municipal officers about your submitted reports.',
+    noChatsTitle: 'No Active Messages Yet',
+    noChatsSub: 'Submit a report to start a direct message conversation with municipal officials.',
   },
   EL: {
     homeMap: 'Χάρτης',
@@ -266,5 +281,10 @@ export const TRANSLATIONS = {
     ageGroup: 'Ηλικιακή Ομάδα',
     phone: 'Αριθμός Τηλεφώνου',
     editProfile: 'Επεξεργασία Προφίλ',
+    messagesTab: 'Συνομιλίες',
+    messagesTitle: 'Απευθείας Συνομιλία με τον Δήμο',
+    messagesSub: 'Επικοινωνήστε απευθείας με τους αρμόδιους υπαλλήλους του Δήμου Παλαιού Φαλήρου για τις αναφορές σας.',
+    noChatsTitle: 'Δεν υπάρχουν ακόμη συνομιλίες',
+    noChatsSub: 'Υποβάλετε μια αναφορά για να ξεκινήσετε απευθείας συνομιλία με τον Δήμο.',
   },
 };

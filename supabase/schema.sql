@@ -126,19 +126,32 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 8. INDEXES FOR HIGH-PERFORMANCE QUERYING
+-- 8. REPORT MESSAGES (Direct Chat Between Admin & Citizens per Report)
+CREATE TABLE IF NOT EXISTS public.report_messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  report_id UUID REFERENCES public.reports(id) ON DELETE CASCADE,
+  sender_id TEXT NOT NULL,
+  sender_type TEXT NOT NULL CHECK (sender_type IN ('admin', 'citizen')),
+  sender_name TEXT NOT NULL,
+  message TEXT NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 9. INDEXES FOR HIGH-PERFORMANCE QUERYING
 CREATE INDEX IF NOT EXISTS idx_reports_category ON public.reports(category);
 CREATE INDEX IF NOT EXISTS idx_reports_status ON public.reports(status);
 CREATE INDEX IF NOT EXISTS idx_reports_user ON public.reports(user_id);
 CREATE INDEX IF NOT EXISTS idx_reports_geo ON public.reports(latitude, longitude);
+CREATE INDEX IF NOT EXISTS idx_report_messages_report ON public.report_messages(report_id, created_at);
 
--- 9. ROW LEVEL SECURITY (RLS) POLICIES
+-- 10. ROW LEVEL SECURITY (RLS) POLICIES
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.reports ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.report_updates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.report_confirmations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.report_messages ENABLE ROW LEVEL SECURITY;
 
 -- Drop existing policies if re-running script
 DROP POLICY IF EXISTS "Public read reports" ON public.reports;
@@ -147,6 +160,9 @@ DROP POLICY IF EXISTS "Public read report updates" ON public.report_updates;
 DROP POLICY IF EXISTS "Public read confirmations" ON public.report_confirmations;
 DROP POLICY IF EXISTS "Public read users basic" ON public.users;
 DROP POLICY IF EXISTS "Public read audit logs" ON public.audit_logs;
+DROP POLICY IF EXISTS "Public read report messages" ON public.report_messages;
+DROP POLICY IF EXISTS "Public insert users" ON public.users;
+DROP POLICY IF EXISTS "Public update users" ON public.users;
 DROP POLICY IF EXISTS "Public insert reports" ON public.reports;
 DROP POLICY IF EXISTS "Public update reports status" ON public.reports;
 DROP POLICY IF EXISTS "Public delete reports" ON public.reports;
@@ -155,16 +171,20 @@ DROP POLICY IF EXISTS "Public insert report updates" ON public.report_updates;
 DROP POLICY IF EXISTS "Public insert audit logs" ON public.audit_logs;
 DROP POLICY IF EXISTS "Public insert report confirmations" ON public.report_confirmations;
 DROP POLICY IF EXISTS "Public delete report confirmations" ON public.report_confirmations;
+DROP POLICY IF EXISTS "Public insert report messages" ON public.report_messages;
 
--- Read policies: Public read for reports, photos, updates, confirmations
+-- Read policies: Public read for reports, photos, updates, confirmations, messages
 CREATE POLICY "Public read reports" ON public.reports FOR SELECT USING (true);
 CREATE POLICY "Public read photos" ON public.photos FOR SELECT USING (true);
 CREATE POLICY "Public read report updates" ON public.report_updates FOR SELECT USING (true);
 CREATE POLICY "Public read confirmations" ON public.report_confirmations FOR SELECT USING (true);
 CREATE POLICY "Public read users basic" ON public.users FOR SELECT USING (true);
 CREATE POLICY "Public read audit logs" ON public.audit_logs FOR SELECT USING (true);
+CREATE POLICY "Public read report messages" ON public.report_messages FOR SELECT USING (true);
 
 -- Insert/Update/Delete policies
+CREATE POLICY "Public insert users" ON public.users FOR INSERT WITH CHECK (true);
+CREATE POLICY "Public update users" ON public.users FOR UPDATE USING (true);
 CREATE POLICY "Public insert reports" ON public.reports FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public update reports status" ON public.reports FOR UPDATE USING (true);
 CREATE POLICY "Public delete reports" ON public.reports FOR DELETE USING (true);
@@ -173,8 +193,9 @@ CREATE POLICY "Public insert report updates" ON public.report_updates FOR INSERT
 CREATE POLICY "Public insert audit logs" ON public.audit_logs FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public insert report confirmations" ON public.report_confirmations FOR INSERT WITH CHECK (true);
 CREATE POLICY "Public delete report confirmations" ON public.report_confirmations FOR DELETE USING (true);
+CREATE POLICY "Public insert report messages" ON public.report_messages FOR INSERT WITH CHECK (true);
 
--- 10. STORAGE BUCKET FOR REPORT PHOTOS
+-- 11. STORAGE BUCKET FOR REPORT PHOTOS
 INSERT INTO storage.buckets (id, name, public) 
 VALUES ('report-photos', 'report-photos', true)
 ON CONFLICT (id) DO NOTHING;
@@ -184,3 +205,16 @@ DROP POLICY IF EXISTS "Public Upload Report Photos" ON storage.objects;
 
 CREATE POLICY "Public Read Report Photos" ON storage.objects FOR SELECT USING (bucket_id = 'report-photos');
 CREATE POLICY "Public Upload Report Photos" ON storage.objects FOR INSERT WITH CHECK (bucket_id = 'report-photos');
+
+-- 12. ENABLE SUPABASE REALTIME PUBLICATION FOR REALTIME CHAT & UPDATES
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM pg_publication WHERE pubname = 'supabase_realtime') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.reports;
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.report_messages;
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.report_updates;
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.report_confirmations;
+  END IF;
+EXCEPTION
+  WHEN OTHERS THEN null;
+END $$;

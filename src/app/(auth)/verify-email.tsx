@@ -43,16 +43,31 @@ export default function VerifyEmailScreen() {
     };
   }, [resendTimer]);
 
-  // Check verification status automatically on mount (e.g. when returning from email link in browser)
+  // Check verification status automatically on mount and poll while screen is active
   useEffect(() => {
-    const checkOnMount = async () => {
+    let isMounted = true;
+    const checkStatus = async () => {
       const status = await checkFirebaseEmailVerificationStatus();
-      if (status.isVerified) {
+      if (status.isVerified && isMounted) {
         setIsVerified(true);
+        verifyUserEmail(userEmail);
       }
     };
-    checkOnMount();
-  }, []);
+
+    checkStatus();
+
+    // Poll every 3.5s while user is waiting on this screen
+    const pollInterval = setInterval(() => {
+      if (!isVerified) {
+        checkStatus();
+      }
+    }, 3500);
+
+    return () => {
+      isMounted = false;
+      clearInterval(pollInterval);
+    };
+  }, [isVerified, userEmail]);
 
   // Auto-verify if oobCode is passed from Firebase deep link
   useEffect(() => {
@@ -67,8 +82,8 @@ export default function VerifyEmailScreen() {
     setLoading(false);
 
     if (res.success) {
-      setIsVerified(true);
       verifyUserEmail(userEmail);
+      setIsVerified(true);
     } else {
       setErrorMessage(res.message || 'Verification link expired or invalid.');
     }
@@ -82,6 +97,7 @@ export default function VerifyEmailScreen() {
     setLoading(false);
 
     if (status.isVerified) {
+      verifyUserEmail(userEmail);
       setIsVerified(true);
     } else {
       setErrorMessage('Verification link not clicked yet. Please open your email and tap the verification link, then tap Check Verification Status.');
@@ -244,7 +260,10 @@ export default function VerifyEmailScreen() {
 
               <TouchableOpacity
                 style={styles.continueBtn}
-                onPress={() => router.replace('/(tabs)')}
+                onPress={() => {
+                  verifyUserEmail(userEmail);
+                  router.replace('/(tabs)');
+                }}
               >
                 <Text style={styles.continueBtnText}>Continue to App</Text>
                 <Ionicons name="arrow-forward" size={18} color="#ffffff" />

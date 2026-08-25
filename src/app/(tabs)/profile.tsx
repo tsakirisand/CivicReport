@@ -16,6 +16,7 @@ import {
 import { useCivicStore } from '../../lib/store';
 import { ATHENS_MUNICIPALITIES, TRANSLATIONS } from '../../types';
 import { deleteCurrentUserAccount } from '../../lib/auth-service';
+import { isReportOwnedByUser } from '../../lib/reports-service';
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export default function ProfileScreen() {
   const [editPhone, setEditPhone] = useState(user?.phone || '');
 
   // Statistics calculation
-  const userReports = reports.filter((r) => r.user_id === user?.id);
+  const userReports = reports.filter((r) => isReportOwnedByUser(r.user_id, user));
   const totalReportsCount = userReports.length;
   const activeCount = userReports.filter((r) => r.status !== 'resolved').length;
   const resolvedCount = userReports.filter((r) => r.status === 'resolved').length;

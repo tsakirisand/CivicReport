@@ -9,17 +9,21 @@
 ### 📱 Citizen Mobile Application (React Native / Expo)
 - **📸 Smart Issue Reporting**: Easily capture and upload photos of municipal issues with automatic geolocation tagging.
 - **📍 Interactive Municipal Map**: View neighborhood issues directly on an interactive map of Palaio Faliro.
+- **💬 Direct Municipal Chat & Standalone Chat Page**: Communicate 1-on-1 in real-time with municipal officers via a dedicated full-screen Chat Page (`/chat/[id]`) with live badges and auto-scrolling.
+- **📬 Dedicated Messages Tab**: Access all active report conversation threads directly from a dedicated bottom navigation tab.
+- **🔒 Creator-Only Chat Privacy**: Strict access control ensuring report chats are private to the report creator and municipal officials.
 - **⏱️ Live Status Progression**: Track issue progress through a transparent 4-stage lifecycle (`Submitted` ➔ `Acknowledged` ➔ `In Progress` ➔ `Resolved`).
 - **✨ "Before & After" Repair Proof**: View side-by-side photo comparisons showing citizen report photos alongside official municipal fix verification photos once resolved.
-- **🔒 Secure Authentication & Privacy**: Sign up with Firebase Authentication (Email/Password or Anonymous Guest mode) with full GDPR profile management and account deletion.
+- **🔒 Secure Authentication & Verification Sync**: Sign up with Firebase Authentication (Email/Password or Anonymous Guest mode) with background verification status polling and GDPR profile management.
 - **🌐 Bilingual Support**: Full English and Greek (Ελληνικά) translation toggle.
 
 ### 🏢 Municipal Admin Dashboard (Next.js 15)
 - **🗺️ Interactive GIS Map View**: Live map powered by CartoDB & OpenStreetMap displaying color-coded issue pins (High Priority, In Progress, Resolved) with instant popups.
+- **💬 Live Direct Citizen Messaging**: Text 1-on-1 with report creators directly from report detail pages with automatic audit logging and real-time WebSocket sync.
 - **📊 Real-time Issue Management**: Update report statuses, attach official municipal notes, and upload "After Repair" proof photos.
 - **📈 Analytics & Key Metrics**: Live statistics on total reports, resolution efficiency, and category breakdown.
 - **📁 UTF-8 CSV Export**: Export comprehensive municipal data to CSV with full UTF-8 BOM encoding for seamless compatibility with Microsoft Excel and Google Sheets.
-- **🛡️ Audit Logging & RLS Security**: Full trail of administrative actions powered by Supabase PostgreSQL Row Level Security (RLS).
+- **🛡️ Audit Logging & RLS Security**: Full trail of administrative actions powered by Supabase PostgreSQL Row Level Security (RLS) and Realtime Publication broadcasting.
 
 ---
 

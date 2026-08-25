@@ -146,13 +146,16 @@ export const useCivicStore = create<CivicReportStore>()(
             u.email.toLowerCase() === emailToVerify ? { ...u, email_verified: true } : u
           );
 
+          const matchedUser = updatedRegisteredUsers.find((u) => u.email.toLowerCase() === emailToVerify);
+
           const updatedUser =
             state.user && state.user.email.toLowerCase() === emailToVerify
               ? { ...state.user, email_verified: true }
-              : state.user;
+              : (matchedUser || (state.user ? { ...state.user, email_verified: true } : null));
 
           return {
             user: updatedUser,
+            isGuest: false,
             registeredUsers: updatedRegisteredUsers,
           };
         }),
@@ -164,28 +167,30 @@ export const useCivicStore = create<CivicReportStore>()(
 
       setReports: (reports) => set({ reports }),
 
-      addReport: (newReportData) => {
-        const id = `cr-${Math.floor(1000 + Math.random() * 9000)}`;
+      addReport: (newReportData: any) => {
+        const id = newReportData.id || `cr-${Math.floor(1000 + Math.random() * 9000)}`;
         const state = get();
-        const created_at = new Date().toISOString();
+        const created_at = newReportData.created_at || new Date().toISOString();
 
         const newReport: Report = {
           ...newReportData,
           id,
-          user_id: state.user ? state.user.id : null,
+          user_id: newReportData.user_id !== undefined ? newReportData.user_id : (state.user ? state.user.id : null),
           user_full_name: newReportData.is_anonymous ? 'Anonymous Citizen' : (state.user ? state.user.full_name : 'Citizen'),
-          status: 'submitted',
+          status: newReportData.status || 'submitted',
           photos_count: newReportData.photos ? newReportData.photos.length : 0,
           photos: newReportData.photos || [],
-          view_count: 1,
-          confirmations_count: 0,
+          view_count: newReportData.view_count || 1,
+          confirmations_count: newReportData.confirmations_count || 0,
           has_user_confirmed: false,
           created_at,
-          updated_at: created_at,
-          updates: [],
+          updated_at: newReportData.updated_at || created_at,
+          updates: newReportData.updates || [],
         };
 
-        set((s) => ({ reports: [newReport, ...s.reports] }));
+        set((s) => ({
+          reports: [newReport, ...s.reports.filter((r) => r.id !== id)],
+        }));
         return newReport;
       },
 

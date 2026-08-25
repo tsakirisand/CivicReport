@@ -16,6 +16,19 @@ export function useReports() {
 
   useEffect(() => {
     load();
+
+    // Subscribe to realtime report updates so new reports appear immediately
+    const channel = supabase
+      .channel('admin-reports-live')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'reports' }, () => {
+        console.log('⚡ Admin Dashboard received Realtime report update');
+        fetchReports().then(setReports);
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   return { reports, setReports, loading, refresh: load };

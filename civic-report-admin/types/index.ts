@@ -31,6 +31,16 @@ export interface ReportUpdate {
   updated_at: string;
 }
 
+export interface ReportMessage {
+  id: string;
+  report_id: string;
+  sender_id: string;
+  sender_type: 'admin' | 'citizen';
+  sender_name: string;
+  message: string;
+  created_at: string;
+}
+
 export interface Report {
   id: string;
   user_id?: string | null;

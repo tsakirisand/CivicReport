@@ -1,6 +1,6 @@
 import { supabase } from './supabase';
 import { useCivicStore } from './store';
-import { Report, ReportCategory, PriorityLevel, ReportStatus } from '../types';
+import { Report, ReportCategory, PriorityLevel, ReportStatus, ReportMessage } from '../types';
 
 /**
  * Converts ANY string (e.g. Firebase UID "8x8IrvOlVqd...", email, or local ID "cr-8816")
@@ -22,6 +22,39 @@ export function toValidUuid(idStr: string | null | undefined): string | null {
 
   const hex = (Math.abs(h1).toString(16).padStart(8, '0') + Math.abs(h2).toString(16).padStart(8, '0') + '0000000000000000').slice(0, 32);
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-4${hex.slice(13, 16)}-a${hex.slice(17, 20)}-${hex.slice(20, 32)}`;
+}
+
+export function isReportOwnedByUser(
+  reportUserId: string | null | undefined,
+  user: { id?: string; email?: string } | null | undefined
+): boolean {
+  if (!reportUserId || !user) return false;
+  const raw = String(reportUserId).trim();
+  if (!raw) return false;
+
+  const targetId = user.id ? String(user.id).trim() : '';
+  const targetEmail = user.email ? String(user.email).trim().toLowerCase() : '';
+
+  // 1. Direct string match with Firebase UID or Email
+  if (targetId && raw === targetId) return true;
+  if (targetEmail && raw.toLowerCase() === targetEmail) return true;
+
+  // 2. Deterministic UUID from Firebase UID (e.g. "8x8IrvOlVqd...")
+  const uuidFromId = targetId ? toValidUuid(targetId) : null;
+  if (uuidFromId && raw === uuidFromId) return true;
+
+  // 3. Deterministic UUID from User Email (e.g. "user@example.com")
+  const uuidFromEmail = targetEmail ? toValidUuid(targetEmail) : null;
+  if (uuidFromEmail && raw === uuidFromEmail) return true;
+
+  // 4. Converted Report UUID match against User UUIDs
+  const reportUuid = toValidUuid(raw);
+  if (reportUuid) {
+    if (uuidFromId && reportUuid === uuidFromId) return true;
+    if (uuidFromEmail && reportUuid === uuidFromEmail) return true;
+  }
+
+  return false;
 }
 
 /**
@@ -121,6 +154,35 @@ export async function fetchAllReports(): Promise<Report[]> {
   }
 }
 
+export async function ensureUserInSupabase(user: any): Promise<string | null> {
+  if (!user) return null;
+  const userUuid = toValidUuid(user.id || user.email);
+  if (!userUuid) return null;
+
+  try {
+    const { error } = await supabase.from('users').upsert(
+      {
+        id: userUuid,
+        email: user.email.toLowerCase(),
+        full_name: user.full_name || user.email.split('@')[0],
+        age: user.age || 25,
+        municipality: user.municipality || 'Παλαιό Φάληρο',
+        occupation: user.occupation || null,
+        phone: user.phone || null,
+      },
+      { onConflict: 'id' }
+    );
+
+    if (error) {
+      console.warn('Supabase ensureUserInSupabase notice:', error.message);
+    }
+    return userUuid;
+  } catch (err) {
+    console.warn('Supabase user upsert exception:', err);
+    return userUuid;
+  }
+}
+
 export async function submitNewReport(reportData: {
   category: ReportCategory;
   description: string;
@@ -133,7 +195,11 @@ export async function submitNewReport(reportData: {
 }): Promise<Report> {
   try {
     const currentUser = useCivicStore.getState().user;
-    const authorUuid = currentUser ? toValidUuid(currentUser.id || currentUser.email) : null;
+    let authorUuid = currentUser ? toValidUuid(currentUser.id || currentUser.email) : null;
+
+    if (currentUser) {
+      authorUuid = await ensureUserInSupabase(currentUser);
+    }
 
     const uploadedPhotoUrls: string[] = [];
     for (let i = 0; i < reportData.photos.length; i++) {
@@ -141,7 +207,11 @@ export async function submitNewReport(reportData: {
       uploadedPhotoUrls.push(publicUrl);
     }
 
-    const { data: insertedReport, error: reportErr } = await supabase
+    let insertedReport: any = null;
+    let reportErr: any = null;
+
+    // 1st Attempt: Insert with authorUuid
+    const res1 = await supabase
       .from('reports')
       .insert({
         user_id: authorUuid,
@@ -157,6 +227,33 @@ export async function submitNewReport(reportData: {
       })
       .select()
       .single();
+
+    insertedReport = res1.data;
+    reportErr = res1.error;
+
+    // 2nd Attempt Fallback: If foreign key constraint is violated, insert with user_id: null
+    if (reportErr && !insertedReport) {
+      console.warn('First insert attempt failed with user_id, retrying with fallback:', reportErr.message);
+      const res2 = await supabase
+        .from('reports')
+        .insert({
+          user_id: null,
+          category: reportData.category,
+          description: reportData.description,
+          latitude: reportData.latitude,
+          longitude: reportData.longitude,
+          address: reportData.address,
+          priority_level: reportData.priority_level,
+          is_anonymous: reportData.is_anonymous,
+          status: 'submitted',
+          photos_count: uploadedPhotoUrls.length,
+        })
+        .select()
+        .single();
+
+      insertedReport = res2.data;
+      reportErr = res2.error;
+    }
 
     if (reportErr || !insertedReport) {
       console.error('Error inserting report to Supabase:', reportErr?.message || JSON.stringify(reportErr));
@@ -322,4 +419,63 @@ export function subscribeToRealtimeReports() {
   return () => {
     supabase.removeChannel(channel);
   };
+}
+
+export async function fetchReportMessages(reportId: string): Promise<ReportMessage[]> {
+  try {
+    const targetUuid = toValidUuid(reportId) || reportId;
+    const { data, error } = await supabase
+      .from('report_messages')
+      .select('*')
+      .eq('report_id', targetUuid)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching report messages:', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (err: any) {
+    console.error('Error in fetchReportMessages:', err?.message || err);
+    return [];
+  }
+}
+
+export async function sendCitizenReportMessage(params: {
+  reportId: string;
+  senderId?: string;
+  senderName?: string;
+  message: string;
+}): Promise<ReportMessage | null> {
+  try {
+    const targetUuid = toValidUuid(params.reportId) || params.reportId;
+    const storeUser = useCivicStore.getState().user;
+    const senderId = params.senderId || (storeUser ? toValidUuid(storeUser.id || storeUser.email) || 'citizen-user' : 'citizen-user');
+    const senderName = params.senderName || storeUser?.full_name || 'Citizen';
+
+    if (!params.message.trim()) return null;
+
+    const { data, error } = await supabase
+      .from('report_messages')
+      .insert({
+        report_id: targetUuid,
+        sender_id: senderId,
+        sender_type: 'citizen',
+        sender_name: senderName,
+        message: params.message.trim(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error sending citizen report message:', error.message);
+      return null;
+    }
+
+    return data;
+  } catch (err: any) {
+    console.error('Error in sendCitizenReportMessage:', err?.message || err);
+    return null;
+  }
 }

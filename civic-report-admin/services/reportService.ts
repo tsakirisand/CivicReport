@@ -1,5 +1,5 @@
 import { supabase } from '../lib/supabase';
-import { Report, ReportStatus } from '../types';
+import { Report, ReportStatus, ReportMessage } from '../types';
 
 export async function fetchReports(): Promise<Report[]> {
   try {
@@ -127,5 +127,66 @@ export async function updateReportStatus(params: {
   } catch (err: any) {
     console.error('Error in updateReportStatus:', err?.message || err);
     return false;
+  }
+}
+
+export async function fetchReportMessages(reportId: string): Promise<ReportMessage[]> {
+  try {
+    const { data, error } = await supabase
+      .from('report_messages')
+      .select('*')
+      .eq('report_id', reportId)
+      .order('created_at', { ascending: true });
+
+    if (error) {
+      console.error('Error fetching report messages:', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (err: any) {
+    console.error('Error in fetchReportMessages:', err?.message || err);
+    return [];
+  }
+}
+
+export async function sendReportMessage(params: {
+  reportId: string;
+  senderId?: string;
+  senderName?: string;
+  message: string;
+}): Promise<ReportMessage | null> {
+  try {
+    const { reportId, senderId = 'admin-officer', senderName = 'Municipality Admin', message } = params;
+    if (!message.trim()) return null;
+
+    const { data, error } = await supabase
+      .from('report_messages')
+      .insert({
+        report_id: reportId,
+        sender_id: senderId,
+        sender_type: 'admin',
+        sender_name: senderName,
+        message: message.trim(),
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error sending report message:', error.message);
+      return null;
+    }
+
+    // Insert audit log for chat action
+    await supabase.from('audit_logs').insert({
+      action: 'ADMIN_SENT_CHAT_MESSAGE',
+      report_id: reportId,
+      changes: { message: message.trim(), sender_name: senderName },
+    });
+
+    return data;
+  } catch (err: any) {
+    console.error('Error in sendReportMessage:', err?.message || err);
+    return null;
   }
 }

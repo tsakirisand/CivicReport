@@ -7,6 +7,11 @@ functions/node_modules/
 .next/
 civic-report-admin/.next/
 
+# Agent & AI scratch folders
+.agents/
+.claude/
+skills-lock.json
+
 # Expo
 .expo/
 dist/

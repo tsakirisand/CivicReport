@@ -106,6 +106,22 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
+        name="messages"
+        options={{
+          title: t.messagesTab || 'Messages',
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+        listeners={{
+          tabPress: (e) => handleGuestTabPress(e, 'chat with municipal officials'),
+        }}
+      />
+      <Tabs.Screen
         name="profile"
         options={{
           title: t.profile,
