@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-labelledby="title desc">
+  <title id="title">CivicReport</title>
+  <desc id="desc">Report local issues. Track real progress. A civic reporting platform for Palaio Faliro.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#102a43"/><stop offset="1" stop-color="#176b73"/></linearGradient>
+    <linearGradient id="pin" x2="0" y2="1"><stop stop-color="#9ff0c3"/><stop offset="1" stop-color="#43c6ac"/></linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#d4f7e8" stroke-opacity=".045"/></pattern>
+  </defs>
+  <rect width="1200" height="360" rx="24" fill="url(#bg)"/>
+  <rect width="1200" height="360" rx="24" fill="url(#grid)"/>
+  <circle cx="1090" cy="20" r="270" fill="#9be7c3" opacity=".04"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="64" y="78" fill="#a6ecd0" font-size="13" font-weight="700" letter-spacing="3">A BETTER WAY TO CARE FOR YOUR CITY</text>
+    <text x="60" y="148" fill="#f5fffc" font-size="58" font-weight="700" letter-spacing="-2">CivicReport</text>
+    <text x="64" y="195" fill="#c5e2df" font-size="22">Report local issues. Track real progress.</text>
+    <g font-size="11" font-weight="700" letter-spacing="1.2" text-anchor="middle">
+      <rect x="64" y="249" width="138" height="36" rx="18" fill="#ffffff" fill-opacity=".08" stroke="#8ad4bd" stroke-opacity=".34"/>
+      <text x="133" y="272" fill="#dcf7ea">REPORT</text>
+      <path d="M214 267h28m-6-5 6 5-6 5" fill="none" stroke="#8ad4bd" stroke-width="1.5"/>
+      <rect x="256" y="249" width="138" height="36" rx="18" fill="#ffffff" fill-opacity=".08" stroke="#8ad4bd" stroke-opacity=".34"/>
+      <text x="325" y="272" fill="#dcf7ea">FOLLOW</text>
+      <path d="M406 267h28m-6-5 6 5-6 5" fill="none" stroke="#8ad4bd" stroke-width="1.5"/>
+      <rect x="448" y="249" width="142" height="36" rx="18" fill="url(#pin)"/>
+      <text x="519" y="272" fill="#103c3b">IMPROVE</text>
+    </g>
+    <rect x="760" y="55" width="370" height="250" rx="16" fill="#102a35" stroke="#79cbb2" stroke-opacity=".3"/>
+    <circle cx="782" cy="79" r="3" fill="#93dcb7"/><circle cx="795" cy="79" r="3" fill="#93dcb7" opacity=".5"/><circle cx="808" cy="79" r="3" fill="#93dcb7" opacity=".25"/>
+    <text x="1098" y="83" fill="#91bdb3" font-size="10" text-anchor="end" letter-spacing="2">PALAIO FALIRO / LIVE MAP</text>
+    <path d="M790 115h310M790 165h310M790 215h310M790 265h310M840 100v190M910 100v190M980 100v190M1050 100v190" fill="none" stroke="#b2ded2" stroke-opacity=".13"/>
+    <path d="M805 251 858 232 898 242 941 190 986 199 1021 149 1080 132" fill="none" stroke="#a3e6c4" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 7" opacity=".8"/>
+    <g transform="translate(941 174)"><path d="M0-24c-12 0-21 9-21 21 0 16 21 38 21 38S21 13 21-3C21-15 12-24 0-24Z" fill="url(#pin)"/><circle cy="-3" r="7" fill="#164b4a"/></g>
+    <g transform="translate(1021 133)"><path d="M0-24c-12 0-21 9-21 21 0 16 21 38 21 38S21 13 21-3C21-15 12-24 0-24Z" fill="#f6c66d"/><circle cy="-3" r="7" fill="#493a24"/></g>
+    <g transform="translate(858 216)"><path d="M0-19c-10 0-17 8-17 17 0 13 17 31 17 31S17 11 17-2C17-11 10-19 0-19Z" fill="#81b8ff"/><circle cy="-2" r="5.5" fill="#17354f"/></g>
+    <rect x="790" y="275" width="110" height="18" rx="9" fill="#ffffff" fill-opacity=".07"/><circle cx="802" cy="284" r="3" fill="#9de1be"/><text x="812" y="288" fill="#b7d7ce" font-size="9">SUBMITTED</text>
+    <rect x="909" y="275" width="102" height="18" rx="9" fill="#ffffff" fill-opacity=".07"/><circle cx="921" cy="284" r="3" fill="#f6c66d"/><text x="931" y="288" fill="#b7d7ce" font-size="9">IN PROGRESS</text>
+    <rect x="1020" y="275" width="96" height="18" rx="9" fill="#ffffff" fill-opacity=".07"/><circle cx="1032" cy="284" r="3" fill="#81b8ff"/><text x="1042" y="288" fill="#b7d7ce" font-size="9">RESOLVED</text>
+  </g>
+</svg>

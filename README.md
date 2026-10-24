@@ -1,5 +1,9 @@
 # 🏛️ CivicReport — Smart Municipal Civic Reporting Platform
 
+<p align="center">
+  <img src="assets/civicreport-banner.svg" alt="CivicReport — Report local issues. Track real progress." width="100%" />
+</p>
+
 > **CivicReport** is a full-stack, real-time municipal civic issue reporting platform tailored for the **Municipality of Palaio Faliro (Δήμος Παλαιού Φαλήρου)**. It empowers citizens to easily report urban infrastructure issues (potholes, street lighting, flooding, waste) while providing municipal administrators with a modern GIS map dashboard for real-time tracking, status management, and proof of repair verification.
 
 ---
