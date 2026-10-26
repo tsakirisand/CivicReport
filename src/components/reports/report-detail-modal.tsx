@@ -12,6 +12,7 @@ import {
   Alert,
   TextInput,
   ActivityIndicator,
+  type ScrollViewInstance,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -44,7 +45,7 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
   const [messages, setMessages] = useState<ReportMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
   const [sendingChat, setSendingChat] = useState(false);
-  const chatScrollViewRef = useRef<ScrollView>(null);
+  const chatScrollViewRef = useRef<ScrollViewInstance>(null);
 
   // Fetch chat messages and listen in real-time
   useEffect(() => {
@@ -145,8 +146,8 @@ export const ReportDetailModal: React.FC<ReportDetailModalProps> = ({
   const handleShare = async () => {
     try {
       await Share.share({
-        title: `CivicReport: ${categoryInfo.label}`,
-        message: `Check out this municipal issue on CivicReport: ${categoryInfo.label} at ${activeReport.address}. Status: ${activeReport.status}`,
+        title: `PolisCheck: ${categoryInfo.label}`,
+        message: `Check out this municipal issue on PolisCheck: ${categoryInfo.label} at ${activeReport.address}. Status: ${activeReport.status}`,
       });
     } catch (error) {
       console.log('Share error', error);

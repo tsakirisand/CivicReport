@@ -163,7 +163,7 @@ export default function CreateReportScreen() {
           lang === 'EL' ? 'Τοποθεσία Εκτός Παλαιού Φαλήρου' : 'Location Outside Palaio Faliro',
           lang === 'EL'
             ? 'Η ζωντανή τοποθεσία σας βρίσκεται εκτός Παλαιού Φαλήρου. Η εφαρμογή λειτουργεί αποκλειστικά στον Δήμο Παλαιού Φαλήρου.'
-            : 'Your live GPS location is outside Palaio Faliro. CivicReport is strictly restricted to the Municipality of Palaio Faliro.'
+            : 'Your live GPS location is outside Palaio Faliro. PolisCheck is strictly restricted to the Municipality of Palaio Faliro.'
         );
         // Default to Palaio Faliro center
         setLatitude(37.9254);

@@ -255,7 +255,7 @@ export default function VerifyEmailScreen() {
               </View>
               <Text style={styles.verifiedTitle}>Email Verified! 🎉</Text>
               <Text style={styles.verifiedSubtitle}>
-                Your email address <Text style={styles.emailHighlight}>{userEmail}</Text> has been successfully verified via Firebase Auth. You now have full citizen access on CivicReport!
+                Your email address <Text style={styles.emailHighlight}>{userEmail}</Text> has been successfully verified via Firebase Auth. You now have full citizen access on PolisCheck!
               </Text>
 
               <TouchableOpacity

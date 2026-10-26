@@ -30,7 +30,7 @@ export default function WelcomeScreen() {
         <View style={styles.logoBadge}>
           <Ionicons name="location" size={38} color="#ffffff" />
         </View>
-        <Text style={styles.brandTitle}>CivicReport</Text>
+        <Text style={styles.brandTitle}>PolisCheck</Text>
         <Text style={styles.brandSubtitle}>Municipality of Palaio Faliro</Text>
         <Text style={styles.brandTagline}>
           Empowering citizens of Palaio Faliro for a cleaner, safer, and better municipality.

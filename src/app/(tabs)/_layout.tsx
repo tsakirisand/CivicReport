@@ -68,7 +68,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? 'map' : 'map-outline'}
               size={size}
-              color={color}
+              color={typeof color === 'number' ? (isDark ? '#94a3b8' : '#64748b') : color ?? (isDark ? '#94a3b8' : '#64748b')}
             />
           ),
         }}
@@ -97,7 +97,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? 'clipboard' : 'clipboard-outline'}
               size={size}
-              color={color}
+              color={typeof color === 'number' ? (isDark ? '#94a3b8' : '#64748b') : color ?? (isDark ? '#94a3b8' : '#64748b')}
             />
           ),
         }}
@@ -113,7 +113,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? 'chatbubbles' : 'chatbubbles-outline'}
               size={size}
-              color={color}
+              color={typeof color === 'number' ? (isDark ? '#94a3b8' : '#64748b') : color ?? (isDark ? '#94a3b8' : '#64748b')}
             />
           ),
         }}
@@ -129,7 +129,7 @@ export default function TabsLayout() {
             <Ionicons
               name={focused ? 'person' : 'person-outline'}
               size={size}
-              color={color}
+              color={typeof color === 'number' ? (isDark ? '#94a3b8' : '#64748b') : color ?? (isDark ? '#94a3b8' : '#64748b')}
             />
           ),
         }}

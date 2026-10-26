@@ -2,7 +2,7 @@ import './globals.css';
 import React from 'react';
 
 export const metadata = {
-  title: 'CivicReport Municipality Admin Portal',
+  title: 'PolisCheck Municipality Admin Portal',
   description: 'Municipal management dashboard for civic issue reports',
 };
 

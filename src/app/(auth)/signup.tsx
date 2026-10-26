@@ -379,7 +379,7 @@ export default function SignUpScreen() {
                   {termsAccepted && <Ionicons name="checkmark" size={12} color="#ffffff" />}
                 </View>
                 <Text style={styles.checkboxLabel}>
-                  I agree to the Terms of Service & Privacy Policy of Palaio Faliro CivicReport.
+                  I agree to the Terms of Service & Privacy Policy of Palaio Faliro PolisCheck.
                 </Text>
               </TouchableOpacity>
 
